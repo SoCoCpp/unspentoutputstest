@@ -1,0 +1,72 @@
+<head>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+	<div>unspent outputs test: all results outputted to the javascript console</div>
+	<script type="text/javascript">
+		function onReady()
+		{
+			//-------------------
+			$.ajax({
+				type: "GET",
+				url: "http://127.0.0.1/api.dws.json",
+				dataType: "json",
+				error: function(data){
+					//-------------------
+					console.log("Query failed: ");
+					console.log(data);
+					//-------------------
+				}, // ajax error:
+				success: function(data){
+					//-------------------
+					console.log("Query success, data: ");
+					console.log(data);
+					//-------------------
+					// $.each and $(data).find are only for parsing DOM HTML objects and don't work here!
+					// Because JSon parsing results are raw objects/arrays not JSon DOM magic objects.
+					//-------------------
+					if (typeof data.unspent_outputs == "undefined")
+					{
+						console.log("unspent_outputs object member not found");
+					}
+					else
+					{
+						//-------------------
+						for (oidx in data.unspent_outputs)
+						{
+							// for...in iterates the index values, not the actual values!
+							uout = data.unspent_outputs[oidx]; // get the actual value with the index
+							//console.log("Output:");
+							//console.log(uout);
+							if (typeof uout.tx_hash == "undefined" || typeof uout.tx_ouput_n == "undefined" || typeof uout.value == "undefined")
+							{
+								console.log("required unspent output fields missing");
+							}
+							else
+							{
+								var tx = uout.tx_hash;
+								var n = uout.tx_ouput_n;
+								var value = uout.value;
+								var amount =  value / 100;
+								console.log(" - tx " + tx + ", n " + n + ", value " + value + ", amount " + amount);
+							}
+						} // for (oidx in data.unspent_outputs)
+						//-------------------
+					}
+					//-------------------
+				}, // ajax success:
+				complete: function(data, status){
+					//-------------------
+					// unused
+					//-------------------
+				} // ajax complete:
+			}); // ajax
+			//-------------------		
+		} // function onReady()
+		//-------------------		
+		// ajax calls must be made after the page loads so ajax is ready
+		// call onRead() function when the page is ready
+		$(document).ready(onReady());
+		//-------------------		
+	</script>
+</body>
